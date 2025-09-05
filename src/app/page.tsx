@@ -1189,7 +1189,7 @@ export default function Portfolio() {
                   width={85}       // set your actual width
                   height={110}      // set your actual height
                   priority          // ensures preloading
-                  className="rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
+                  className="w-85 h-110 rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
                 />
             </motion.div>
 
