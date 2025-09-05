@@ -21,13 +21,6 @@ It showcases my projects, achievements, experience, skills, and certifications �
 
 ---
 
-## 📸 Preview
-
-| Desktop View | Mobile View |
-|--------------|-------------|
-| ![Desktop Screenshot](./public/preview-desktop.png) | ![Mobile Screenshot](./public/preview-mobile.png) |
-
----
 
 ## 🛠️ Tech Stack
 
