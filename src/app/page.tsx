@@ -1183,7 +1183,7 @@ export default function Portfolio() {
              {/* Profile Photo */}
             <motion.div variants={fadeUp} className="flex justify-center">
               <img
-                src="/photo/profile.jpg"
+                src="/photo/Profile.jpg"
                 alt="Profile"
                 className="w-85 h-110 rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
               />
