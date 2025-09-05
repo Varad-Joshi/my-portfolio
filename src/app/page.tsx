@@ -3,16 +3,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Github,
-  Linkedin,
-  Mail,
-  ArrowDown,
-  Code2,
-  ShieldCheck,
-  Brain,
-  Phone,
-} from "lucide-react";
+import { Mail, Phone, Github, Linkedin, Download, Send, Moon, Sun, Menu, X, ExternalLink, ChevronDown } from "lucide-react";
+
 
 /**
  * Portfolio - merged / enhanced version
