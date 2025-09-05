@@ -1186,8 +1186,8 @@ export default function Portfolio() {
               <Image
                   src="/photo/Profile.jpg"
                   alt="Profile"
-                  width={85}       // set your actual width
-                  height={110}      // set your actual height
+                  width={240}       // set your actual width
+                  height={340}      // set your actual height
                   priority          // ensures preloading
                   className="rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
                 />
