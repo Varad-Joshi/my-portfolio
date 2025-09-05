@@ -779,6 +779,7 @@
 // file: components/Portfolio.tsx  (or app/page.tsx)
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -1182,11 +1183,14 @@ export default function Portfolio() {
           >
              {/* Profile Photo */}
             <motion.div variants={fadeUp} className="flex justify-center">
-              <img
-                src="/photo/Profile.jpg"
-                alt="Profile"
-                className="w-85 h-110 rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
-              />
+              <Image
+                  src="/photo/Profile.jpg"
+                  alt="Profile"
+                  width={85}       // set your actual width
+                  height={110}      // set your actual height
+                  priority          // ensures preloading
+                  className="rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
+                />
             </motion.div>
 
             <motion.div variants={fadeUp}>
