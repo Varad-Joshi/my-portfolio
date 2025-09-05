@@ -3,8 +3,16 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Github, Linkedin, Download, Send, Moon, Sun, Menu, X, ExternalLink, ChevronDown } from "lucide-react";
-
+import {
+  Github,
+  Linkedin,
+  Mail,
+  ArrowDown,
+  Code2,
+  ShieldCheck,
+  Brain,
+  Phone,
+} from "lucide-react";
 
 /**
  * Portfolio - merged / enhanced version
@@ -182,7 +190,8 @@ const certificatesList = [
 
 function CertificateItem({ certificate }: { certificate: { name: string; file: string } }) {
   const [open, setOpen] = useState(false);
-  const filePath = `/certificates/${certificate.file}`;
+  const filePath = `/api/certificates/${certificate.file}`;
+
 
   return (
     <li className="rounded-md border p-3 bg-white/10">
