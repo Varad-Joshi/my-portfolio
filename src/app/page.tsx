@@ -1186,10 +1186,10 @@ export default function Portfolio() {
               <Image
                   src="/photo/Profile.jpg"
                   alt="Profile"
-                  width={85}       // set your actual width
-                  height={110}      // set your actual height
+                  width={340}       // set your actual width
+                  height={440}      // set your actual height
                   priority          // ensures preloading
-                  className="w-85 h-110 rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
+                  className="rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
                 />
             </motion.div>
 
