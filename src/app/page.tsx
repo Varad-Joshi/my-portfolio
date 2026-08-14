@@ -27,26 +27,33 @@ import {
  * Make sure TailwindCSS, framer-motion and lucide-react are installed.
  */
 
-// Color palette (tweakable)
-const COLORS = {
-  richBlack: "#0a2027",
-  prussianBlue: "#003459",
-  cerulean: "#007ea7",
-  pictonBlue: "#00a8e8",
-  white: "#ffffff",
+// Premium Blue Color System - Design tokens for reference
+// (Colors defined as CSS custom properties in globals.css)
+
+// Motion variants - Premium animations
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.6 } 
+  },
 };
 
-// Motion helpers
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0 },
+const fadeInScale = {
+  hidden: { opacity: 0, scale: 0.95 },
+  show: { 
+    opacity: 1, 
+    scale: 1, 
+    transition: { duration: 0.5 } 
+  },
 };
 
 const containerStagger = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.12 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
   },
 };
 
@@ -192,7 +199,7 @@ const certificatesList = [
 //   );
 // }
 
-function CertificateItem({ certificate }: { certificate: { name: string; file: string } }) {
+function CertificateItem({ certificate, isDark }: { certificate: { name: string; file: string }; isDark: boolean }) {
   const [open, setOpen] = useState(false);
   const filePath = `/api/certificates/${certificate.file}`;
   
@@ -200,38 +207,50 @@ function CertificateItem({ certificate }: { certificate: { name: string; file: s
   const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(certificate.file);
 
   return (
-    <li className="rounded-md border p-3 bg-white/10">
-      <button
+    <motion.li
+      whileHover={{ y: -2 }}
+      className={`rounded-lg border p-4 transition cursor-pointer ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/30" : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 hover:border-blue-300"}`}
+    >
+      <motion.button
         onClick={() => setOpen(!open)}
-        className="w-full text-left font-medium hover:underline flex justify-between items-center"
+        className={`w-full text-left font-medium flex justify-between items-center ${isDark ? "text-white hover:text-blue-400" : "text-[#0a1428] hover:text-blue-600"}`}
+        whileHover={{ x: 4 }}
       >
-        {certificate.name}
-        <span className="text-xs opacity-70">{open ? "▲ Hide" : "▼ Show"}</span>
-      </button>
+        <span className={`text-sm ${isDark ? "text-slate-300" : "text-slate-700"}`}>{certificate.name}</span>
+        <span className={`text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+          {open ? "▲" : "▼"}
+        </span>
+      </motion.button>
 
-      {open && (
-        <div className="mt-3 border rounded-lg overflow-hidden bg-white">
-          {isImage ? (
-            // For images: use an img tag with proper sizing
-            <div className="flex justify-center p-4">
-              <img
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 border rounded-lg overflow-hidden"
+          >
+            {isImage ? (
+              <div className={`flex justify-center p-4 ${isDark ? "bg-white/5" : "bg-white"}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={filePath}
+                  className="max-w-full max-h-96 object-contain rounded-lg shadow-lg"
+                  alt={certificate.name}
+                />
+              </div>
+            ) : (
+              <iframe
                 src={filePath}
-                className="max-w-full max-h-96 object-contain"
-                alt={certificate.name}
+                className="w-full h-96"
+                title={certificate.name}
+                frameBorder="0"
               />
-            </div>
-          ) : (
-            // For PDFs: use iframe but with better styling
-            <iframe
-              src={filePath}
-              className="w-full h-96"
-              title={certificate.name}
-              frameBorder="0"
-            />
-          )}
-        </div>
-      )}
-    </li>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.li>
   );
 }
 
@@ -254,18 +273,12 @@ const navItems = [
 ];
 
 // Reusable small components
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border px-3 py-1 text-xs font-medium shadow-sm border-white/10">
-      {children}
-    </span>
-  );
-}
-
 function ProjectCard({
   project,
+  isDark,
 }: {
   project: typeof projectsData[0];
+  isDark: boolean;
 }) {
   return (
     <motion.article
@@ -273,42 +286,54 @@ function ProjectCard({
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.2 }}
-      className="group relative overflow-hidden rounded-2xl border bg-white/5 p-5 shadow-sm backdrop-blur transition hover:shadow-lg border-white/10"
+      whileHover={{ y: -4 }}
+      className={`group relative overflow-hidden rounded-2xl border p-6 shadow-md backdrop-blur transition ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/30 hover:shadow-lg hover:shadow-blue-500/10" : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-600/10"}`}
     >
       <div className="flex items-start gap-4">
         <div
-          aria-hidden
-          className="rounded-2xl p-3 text-white shadow flex items-center justify-center"
+          className={`rounded-xl p-3 shadow flex items-center justify-center text-white flex-shrink-0`}
           style={{
-            background: `linear-gradient(135deg, ${COLORS.pictonBlue}, ${COLORS.cerulean})`,
-            minWidth: 44,
-            minHeight: 44,
+            background: `linear-gradient(135deg, ${isDark ? "#0066ff" : "#0052cc"}, ${isDark ? "#06b6d4" : "#0891b2"})`,
+            minWidth: 48,
+            minHeight: 48,
           }}
         >
           <Code2 className="h-6 w-6" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg font-semibold leading-tight text-white">
+          <h3 className={`text-lg font-semibold leading-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
             {project.title}
-            <span className="ml-2 text-sm font-normal text-slate-300">
-              — {project.subtitle}
-            </span>
           </h3>
-          <p className="mt-2 text-sm text-slate-200/90">{project.description}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+            {project.subtitle}
+          </p>
+          <p className={`mt-3 text-sm leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+            {project.description}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
             {project.tags.map((t) => (
-              <Badge key={t}>{t}</Badge>
+              <span
+                key={t}
+                className={`rounded-full border px-3 py-1 text-xs font-medium ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300" : "border-blue-300 bg-blue-100 text-blue-700"}`}
+              >
+                {t}
+              </span>
             ))}
           </div>
           <div className="mt-4 flex items-center gap-3">
             {project.repo && (
-              <a
+              <motion.a
                 href={project.repo}
-                className="inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-sm font-medium transition hover:-translate-y-0.5 hover:shadow border-white/10 text-white"
+                target="_blank"
+                rel="noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300 hover:bg-blue-400/20" : "border-blue-300 bg-blue-100 text-blue-700 hover:bg-blue-200"}`}
                 aria-label={`View ${project.title} code`}
               >
-                Code <Github className="h-4 w-4" />
-              </a>
+                View Code
+                <Github className="h-4 w-4" />
+              </motion.a>
             )}
           </div>
         </div>
@@ -321,6 +346,9 @@ function ProjectCard({
 export default function Portfolio() {
   // filter state
   const [filter, setFilter] = useState<string>("All");
+
+  // Theme state
+  const [isDark, setIsDark] = useState(true);
 
   // short loading spinner (first-stage), and intro splash (second-stage)
   const [loadingShort, setLoadingShort] = useState(true);
@@ -351,20 +379,35 @@ export default function Portfolio() {
     return projectsData.filter((p) => p.tags.includes(filter));
   }, [filter]);
 
-  // Short loading spinner UI
+  // Short loading spinner UI - 1.2s fast load
   if (loadingShort) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-600 to-cyan-600 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mx-auto">
-            <div className="w-20 h-20 border-4 border-white/30 rounded-full animate-spin border-t-white mb-4" />
-            <div className="absolute inset-0 rounded-full animate-pulse border border-transparent border-t-sky-300/40" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, rgb(37, 99, 235), rgb(59, 130, 246), rgb(6, 182, 212))' }}>
+        <div className="text-center space-y-4">
+          <div className="relative mx-auto w-24 h-24">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 rounded-full border-2 border-white/20 border-t-white"
+            />
           </div>
-          <div className="text-white text-xl font-semibold tracking-wide mt-2">Loading portfolio...</div>
-          <div className="mt-2 flex justify-center space-x-1">
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div className="text-white text-lg font-semibold tracking-wide">Building premium experience...</div>
+          <div className="flex justify-center gap-1">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
+              className="w-2 h-2 bg-white/80 rounded-full"
+            />
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
+              className="w-2 h-2 bg-white/80 rounded-full"
+            />
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
+              className="w-2 h-2 bg-white/80 rounded-full"
+            />
           </div>
         </div>
       </div>
@@ -372,424 +415,576 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="bg-rich-black text-white min-h-screen">
-      {/* Intro Splash (AnimatePresence) from earlier design, increased duration */}
-      <AnimatePresence>
-        {!introDone && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-rich-black text-white"
-            style={{
-              background: `radial-gradient(1200px 600px at 10% -10%, ${COLORS.prussianBlue}33, transparent), radial-gradient(1000px 500px at 100% 0%, ${COLORS.pictonBlue}22, transparent), ${COLORS.richBlack}`,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            aria-hidden
-          >
+    <div className={isDark ? "dark" : "light"} style={{ colorScheme: isDark ? "dark" : "light" }}>
+      <div className={`min-h-screen transition-colors`} style={{
+        backgroundImage: isDark 
+          ? 'linear-gradient(to bottom, rgb(10, 15, 26), rgb(15, 22, 35), rgb(10, 15, 26))'
+          : 'linear-gradient(to bottom, rgb(255, 255, 255), rgb(240, 249, 255), rgb(255, 255, 255))'
+      }}>
+        {/* Intro Splash - Reduced to 2s for better UX */}
+        <AnimatePresence>
+          {!introDone && (
             <motion.div
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.9, ease: "easeOut" }}
-              className="text-center"
+              className="fixed inset-0 z-[100] flex items-center justify-center"
+              style={{
+                backgroundImage: isDark 
+                  ? 'linear-gradient(to bottom right, rgba(30, 58, 138, 0.2), rgb(20, 31, 50), rgb(10, 20, 40))'
+                  : 'linear-gradient(to bottom right, rgb(240, 249, 255), rgb(255, 255, 255), rgb(240, 249, 255))'
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              aria-hidden
             >
-              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium border-white/10">
-                <ShieldCheck className="h-4 w-4" /> AI • NLP/OCR • Blockchain
-              </div>
-              <h1 className="mt-4 text-5xl font-extrabold tracking-tight md:text-6xl">
-                Hi, I&apos;m{" "}
-                <span className="bg-gradient-to-r from-[#00a8e8] to-[#007ea7] bg-clip-text text-transparent">
-                  {CONTACT.name}
-                </span>
-              </h1>
-              <p className="mt-3 text-sm md:text-base text-slate-200/90">
-                Engineer crafting intelligent, privacy-first experiences.
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="text-center space-y-4"
+              >
+                <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium backdrop-blur ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300" : "border-blue-300 bg-blue-50 text-blue-700"}`}>
+                  <ShieldCheck className="h-4 w-4" /> AI • ML • Blockchain
+                </div>
+                <h1 className={`text-5xl md:text-6xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                  Hi, I&apos;m{" "}
+                  <span className="bg-clip-text text-transparent" style={{
+                    backgroundImage: isDark 
+                      ? 'linear-gradient(to right, rgb(96, 165, 250), rgb(6, 182, 212))'
+                      : 'linear-gradient(to right, rgb(37, 99, 235), rgb(14, 116, 144))'
+                  }}>
+                    Varad
+                  </span>
+                </h1>
+                <p className={`text-lg ${isDark ? "text-slate-300" : "text-slate-600"}`}>
+                  Building intelligent, secure, premium experiences.
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main content */}
+        <main className={`relative min-h-screen transition-colors`}>
+          {/* Premium Header with Dark/Light Toggle */}
+          <header className={`sticky top-0 z-50 backdrop-blur-md border-b transition-all ${isDark ? "bg-[#0a0f1a]/70 border-white/5" : "bg-white/70 border-blue-100"}`}>
+            <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+              <motion.a
+                href="#home"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`font-bold text-lg tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}
+                aria-label="Go to home"
+              >
+                VJ
+              </motion.a>
+
+              <nav className="hidden items-center gap-8 md:flex">
+                {navItems.map(({ label, href, icon: Icon }) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    whileHover={{ y: -2 }}
+                    className={`flex items-center gap-2 text-sm font-medium transition ${isDark ? "text-slate-300 hover:text-blue-400" : "text-slate-600 hover:text-blue-600"}`}
+                  >
+                    <Icon className="w-4 h-4" /> {label}
+                  </motion.a>
+                ))}
+              </nav>
+
+              {/* Dark/Light Mode Toggle */}
+              <motion.button
+                onClick={() => setIsDark(!isDark)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`p-2 rounded-lg transition ${isDark ? "bg-white/10 hover:bg-white/20 text-yellow-300" : "bg-blue-100 hover:bg-blue-200 text-blue-800"}`}
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? "☀️" : "🌙"}
+              </motion.button>
+            </div>
+          </header>
+
+          {/* Hero Section */}
+          <section id="home" className="relative flex min-h-[85vh] items-center py-12 px-6">
+            <motion.div
+              variants={containerStagger}
+              initial="hidden"
+              animate="show"
+              className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 md:grid-cols-2"
+            >
+              {/* Profile Photo */}
+              <motion.div variants={fadeInScale} className="flex justify-center order-2 md:order-1">
+                <div className={`rounded-3xl overflow-hidden shadow-2xl border-4 ${isDark ? "border-blue-500/30" : "border-blue-200"}`}>
+                  <Image
+                    src="/photo/Profile.jpg"
+                    alt="Profile"
+                    width={280}
+                    height={380}
+                    priority
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Hero Text */}
+              <motion.div variants={fadeUp} className="space-y-6 order-1 md:order-2">
+                <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium backdrop-blur w-fit ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300" : "border-blue-300 bg-blue-50 text-blue-700"}`}>
+                  <ShieldCheck className="h-4 w-4" /> Privacy • AI/ML • Blockchain
+                </div>
+
+                <div className="space-y-3">
+                  <h1 className={`text-5xl md:text-6xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                    Hi, I&apos;m{" "}
+                    <span className="bg-clip-text text-transparent" style={{
+                      backgroundImage: isDark 
+                        ? 'linear-gradient(to right, rgb(96, 165, 250), rgb(6, 182, 212))'
+                        : 'linear-gradient(to right, rgb(37, 99, 235), rgb(14, 116, 144))'
+                    }}>
+                      Varad Joshi
+                    </span>
+                  </h1>
+                  <p className={`text-lg font-medium leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    I build <span className={`font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}>intelligent</span> and <span className={`font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}>secure</span> experiences using AI, ML, and blockchain technology.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <motion.a
+                    href="#projects"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="rounded-xl px-6 py-3 font-semibold transition shadow-lg text-white hover:shadow-xl"
+                    style={{
+                      backgroundImage: isDark
+                        ? 'linear-gradient(to right, rgb(59, 130, 246), rgb(6, 182, 212))'
+                        : 'linear-gradient(to right, rgb(37, 99, 235), rgb(14, 116, 144))',
+                      boxShadow: isDark ? '0 10px 15px -3px rgba(59, 130, 246, 0.3)' : '0 10px 15px -3px rgba(37, 99, 235, 0.3)'
+                    }}
+                  >
+                    See Projects
+                  </motion.a>
+                  <motion.a
+                    href={`mailto:${CONTACT.email}`}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`rounded-xl px-6 py-3 font-semibold transition border ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300 hover:bg-blue-400/20" : "border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100"}`}
+                  >
+                    Get in Touch
+                  </motion.a>
+                </div>
+
+                <div className={`flex items-center gap-6 pt-4 border-t ${isDark ? "border-white/10 text-slate-300" : "border-blue-100 text-slate-700"}`}>
+                  <motion.a
+                    href={CONTACT.github}
+                    whileHover={{ scale: 1.1 }}
+                    className={`flex items-center gap-2 transition ${isDark ? "hover:text-blue-400" : "hover:text-blue-600"}`}
+                  >
+                    <Github className="h-5 w-5" /> <span className="text-sm font-medium">GitHub</span>
+                  </motion.a>
+
+                  <motion.a
+                    href={CONTACT.linkedin}
+                    whileHover={{ scale: 1.1 }}
+                    className={`flex items-center gap-2 transition ${isDark ? "hover:text-blue-400" : "hover:text-blue-600"}`}
+                  >
+                    <Linkedin className="h-5 w-5" /> <span className="text-sm font-medium">LinkedIn</span>
+                  </motion.a>
+
+                  <motion.a
+                    href={`mailto:${CONTACT.email}`}
+                    whileHover={{ scale: 1.1 }}
+                    className={`flex items-center gap-2 transition ${isDark ? "hover:text-blue-400" : "hover:text-blue-600"}`}
+                  >
+                    <Mail className="h-5 w-5" /> <span className="text-sm font-medium">Email</span>
+                  </motion.a>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Scroll indicator */}
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2"
+            >
+              <ArrowDown className={`h-6 w-6 ${isDark ? "text-slate-400" : "text-slate-500"}`} />
+            </motion.div>
+          </section>
+
+          {/* About Section */}
+          <section id="about" className="mx-auto max-w-6xl px-6 py-20 space-y-8">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-3"
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                About Me
+              </h2>
+              <p className={`text-lg font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                Passionate engineer building intelligent solutions
               </p>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Main content */}
-      <main
-        className="relative min-h-screen bg-rich-black text-white antialiased transition-colors"
-        style={{
-          background: `radial-gradient(1200px 600px at 10% -10%, ${COLORS.prussianBlue}33, transparent), radial-gradient(1000px 500px at 100% 0%, ${COLORS.pictonBlue}22, transparent), ${COLORS.richBlack}`,
-        }}
-      >
-        {/* Header */}
-        <header className="sticky top-0 z-50 border-b bg-[#00171f]/60 backdrop-blur border-white/10">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <a href="#home" className="font-semibold tracking-tight" aria-label="Go to home">
-              {CONTACT.name}
-            </a>
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className={`max-w-3xl text-lg leading-relaxed ${isDark ? "text-slate-300" : "text-slate-700"}`}
+            >
+              I&apos;m passionate about technology and innovation. With a strong foundation in software development, I aim to contribute to real-world projects by designing, coding, and debugging robust applications. I bring strong communication and adaptability to environments that value creativity and growth.
+            </motion.p>
 
-            <nav className="hidden items-center gap-6 md:flex">
-              {navItems.map(({ label, href, icon: Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  className="flex items-center gap-1 text-sm text-slate-300 transition hover:text-[#00a8e8]"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  label: "📍 Location",
+                  value: CONTACT.location,
+                  detail: "Based in India",
+                },
+                {
+                  label: "📧 Contact",
+                  value: CONTACT.phone,
+                  detail: CONTACT.email,
+                },
+                {
+                  label: "🎓 Education",
+                  value: "B.Tech in AI & DS",
+                  detail: "K.K. Wagh Institute",
+                },
+              ].map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className={`rounded-2xl border p-6 transition ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/30" : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 hover:border-blue-300"}`}
                 >
-                  <Icon className="w-4 h-4" /> {label}
-                </a>
+                  <div className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                    {item.label}
+                  </div>
+                  <div className={`mt-2 text-lg font-semibold ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                    {item.value}
+                  </div>
+                  <div className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                    {item.detail}
+                  </div>
+                </motion.div>
               ))}
-            </nav>
-          </div>
-        </header>
+            </div>
+          </section>
 
-        {/* Hero */}
-        <section id="home" className="relative flex min-h-[90vh] items-center py-8">
+          {/* Projects Section */}
+          <section id="projects" className="mx-auto max-w-6xl px-6 py-20 space-y-8">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-2"
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                Featured Projects
+              </h2>
+              <p className={`text-lg ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                Backend, ML, and blockchain-focused work
+              </p>
+            </motion.div>
+
+            {/* Filter Tags */}
+            <div className="flex flex-wrap gap-2">
+              {allTags.map((t) => (
+                <motion.button
+                  key={t}
+                  onClick={() => setFilter(t)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition border ${
+                    filter === t
+                      ? isDark
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-blue-600 text-white border-blue-600"
+                      : isDark
+                        ? "border-white/10 text-slate-300 hover:border-blue-400/30 hover:bg-blue-400/10"
+                        : "border-blue-200 text-slate-600 hover:border-blue-300 hover:bg-blue-100"
+                  }`}
+                  aria-pressed={filter === t}
+                >
+                  {t}
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Projects Grid */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {filtered.map((p) => (
+                <ProjectCard key={p.title} project={p} isDark={isDark} />
+              ))}
+            </div>
+          </section>
+
+          {/* Achievements Section */}
+          <section id="achievements" className="mx-auto max-w-6xl px-6 py-20 space-y-8">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-2"
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                Achievements & Hackathons
+              </h2>
+              <p className={`text-lg ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                Awards, hackathon results, and recognitions
+              </p>
+            </motion.div>
+
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {achievementsFromCV.map((a, idx) => (
+                <motion.div
+                  key={a.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className={`rounded-2xl border p-5 transition ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/30" : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 hover:border-blue-300"}`}
+                >
+                  <div className={`text-xs font-semibold uppercase tracking-wide ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+                    {a.when}
+                  </div>
+                  <div className={`mt-2 font-semibold text-lg ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                    {a.title}
+                  </div>
+                  <div className={`mt-2 text-sm leading-relaxed ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                    {a.detail}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* Experience Section */}
+          <section id="experience" className="mx-auto max-w-6xl px-6 py-20 space-y-8">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-2"
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                Experience
+              </h2>
+              <p className={`text-lg ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                Professional roles and contributions
+              </p>
+            </motion.div>
+
+            <div className={`space-y-6 border-l-2 pl-6 ${isDark ? "border-blue-500/30" : "border-blue-300"}`}>
+              {experienceFromCV.map((e, idx) => (
+                <motion.div
+                  key={e.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="relative group"
+                >
+                  {/* Timeline dot */}
+                  <div className={`absolute -left-8 top-2 h-4 w-4 rounded-full border-2 shadow-lg border-blue-500 ${isDark ? "bg-[#0a1428]" : "bg-white"}`} />
+
+                  <div className={`rounded-2xl border p-6 transition ${isDark ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-blue-400/30" : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 hover:border-blue-300"}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <h3 className={`text-lg font-semibold ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                        {e.title}
+                      </h3>
+                      <span className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                        {e.period}
+                      </span>
+                    </div>
+                    <ul className={`mt-4 space-y-2 text-sm leading-relaxed list-disc list-inside ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                      {e.details.map((p, i) => (
+                        <li key={i}>{p}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* Skills & Certificates Section */}
+          <section id="skills" className="mx-auto max-w-6xl px-6 py-20">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              className="space-y-2 mb-8"
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                Skills & Certifications
+              </h2>
+              <p className={`text-lg ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                Technical expertise and professional development
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-10">
+              {/* Skills */}
+              <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="space-y-6">
+                <h3 className={`text-2xl font-bold ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                  Skills
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {[
+                    "Python",
+                    "FastAPI",
+                    "SQL",
+                    "Java",
+                    "MongoDB",
+                    "NLP",
+                    "OCR",
+                    "Computer Vision",
+                    "React",
+                    "Tauri",
+                    "PHP",
+                    "Flutter",
+                    "Firebase",
+                    "Blockchain",
+                    "IPFS",
+                  ].map((s, idx) => (
+                    <motion.div
+                      key={s}
+                      variants={fadeUp}
+                      initial="hidden"
+                      whileInView="show"
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.02 }}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      className={`rounded-lg border px-4 py-3 text-sm font-medium text-center transition ${isDark ? "border-blue-400/30 bg-blue-400/10 text-blue-300 hover:bg-blue-400/20" : "border-blue-300 bg-blue-100 text-blue-700 hover:bg-blue-200"}`}
+                    >
+                      {s}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Certificates */}
+              <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="space-y-6">
+                <h3 className={`text-2xl font-bold ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                  Certificates
+                </h3>
+                <ul className="space-y-2">
+                  {certificatesList.map((certificate, i) => (
+                    <CertificateItem key={i} certificate={certificate} isDark={isDark} />
+                  ))}
+                </ul>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className={`mt-16 py-12 border-t transition ${isDark ? "border-white/10 bg-white/5" : "border-blue-100 bg-blue-50/50"}`}>
+            <div className={`max-w-6xl mx-auto px-6 text-center text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <p className="mb-4">
+                Crafted with <span className="text-red-500">❤️</span> by {CONTACT.name}
+              </p>
+              <p>© {new Date().getFullYear()} All rights reserved.</p>
+            </div>
+          </footer>
+        </main>
+
+        {/* Floating Contact Card - Premium Design */}
+        <div className="fixed right-6 bottom-6 z-60 transform transition-all">
           <motion.div
-            variants={containerStagger}
-            initial="hidden"
-            animate="show"
-            className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 px-4 md:grid-cols-2"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+            className="group"
           >
-             {/* Profile Photo */}
-            <motion.div variants={fadeUp} className="flex justify-center">
-              <Image
-                  src="/photo/Profile.jpg"
-                  alt="Profile"
-                  width={240}       // set your actual width
-                  height={340}      // set your actual height
-                  priority          // ensures preloading
-                  className="rounded-3xl object-cover shadow-lg border-4 border-[#00a8e8]"
-                />
-            </motion.div>
-
-            <motion.div variants={fadeUp}>
-              <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium border-white/10">
-                <ShieldCheck className="h-4 w-4" /> Privacy •  AI/ML •  NLP •  Blockchain
-              </div>
-
-              <h1 className="mt-4 text-4xl font-extrabold tracking-tight md:text-6xl text-white">
-                Hi, I&apos;m{" "}
-                <span className="bg-gradient-to-r from-[#00a8e8] to-[#007ea7] bg-clip-text text-transparent">
-                  Varad Joshi
-                </span>
-              </h1>
-
-                <p className="mt-4 max-w-xl text-lg font-medium text-white">
-                <span className="bg-gradient-to-r from-[#00a8e8] to-[#007ea7] bg-clip-text text-transparent">
-                  Building
-                </span>{" "}
-                <span className="bg-gradient-to-r from-[#00a8e8] to-[#007ea7] bg-clip-text text-transparent">
-                  intelligent
-                </span>{" "}
-                <span className="bg-gradient-to-r from-[#00a8e8] to-[#007ea7] bg-clip-text text-transparent">
-                  and secure experiences.
-                </span>
-              </p> 
-
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <a
-                  href="#projects"
-                  className="rounded-xl border px-4 py-2 font-medium transition hover:-translate-y-0.5 hover:shadow border-white/10 text-white"
+            <div className={`rounded-2xl border backdrop-blur shadow-2xl p-4 transition ${isDark ? "bg-navy-900/95 border-blue-500/20" : "bg-blue-50/95 border-blue-300"}`}>
+              <div className="flex items-center gap-3 w-72">
+                {/* Avatar */}
+                <motion.div
+                  className="flex-shrink-0 w-14 h-14 rounded-xl font-bold text-white text-lg flex items-center justify-center shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                  style={{
+                    backgroundImage: 'linear-gradient(to bottom right, rgb(59, 130, 246), rgb(6, 182, 212))'
+                  }}
                 >
-                  See Projects
-                </a>  
-              </div>
+                  VJ
+                </motion.div>
 
-              <div className="mt-6 flex items-center gap-4 text-slate-300">
-                <a href={CONTACT.github} className="inline-flex items-center gap-2 transition hover:opacity-80" aria-label="GitHub">
-                  <Github className="h-5 w-5" /> GitHub
-                </a>
-
-                <a href={CONTACT.linkedin} className="inline-flex items-center gap-2 transition hover:opacity-80" aria-label="LinkedIn">
-                  <Linkedin className="h-5 w-5" /> LinkedIn
-                </a>
-
-                <a href={`mailto:${CONTACT.email}`} className="inline-flex items-center gap-2 transition hover:opacity-80" aria-label="Email">
-                  <Mail className="h-5 w-5" /> Email
-                </a>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="relative col-span-1 md:col-span-2 flex justify-center">
-              {/* Decorative card */}
-              <div
-                className="relative overflow-hidden rounded-3xl border p-6 shadow-lg border-white/10"
-                style={{ background: `linear-gradient(180deg, ${COLORS.prussianBlue}1a, transparent)` }}
-              >
-                <div
-                  className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full blur-3xl"
-                  style={{ background: `radial-gradient(closest-side, ${COLORS.pictonBlue}55, transparent)` }}
-                />
-                <div
-                  className="pointer-events-none absolute -bottom-10 -left-10 h-64 w-64 rounded-full blur-3xl"
-                  style={{ background: `radial-gradient(closest-side, ${COLORS.cerulean}44, transparent)` }}
-                />
-                <section >
-                <div className="relative z-80 text-center">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium shadow backdrop-blur">
-                    <Brain className="h-4 w-4" /> AI • Data • Security
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className={`font-semibold text-sm ${isDark ? "text-white" : "text-[#0a1428]"}`}>
+                    {CONTACT.name}
                   </div>
+                  <div className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                    {CONTACT.location}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <motion.a
+                      href={`tel:${CONTACT.phone.replace(/\s+/g, "")}`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${isDark ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300" : "bg-blue-200 hover:bg-blue-300 text-blue-700"}`}
+                    >
+                      <Phone className="w-3 h-3" /> Call
+                    </motion.a>
 
-                  <h3 className="mt-4 text-xl font-semibold text-white">What I love</h3>
-                  <p className="mt-1 text-sm text-slate-200/90">
-                    Engineer crafting intelligent, privacy-first experiences.
-                  </p>
-
-                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-                    <div className="rounded-2xl border p-3 border-white/10">
-                      <div className="text-xs text-slate-300">Core Focus</div>
-                      <div className="mt-1 font-medium text-white">Software Development, AI/ML, Blockchain</div>
-                    </div>
-
-                    <div className="rounded-2xl border p-3 border-white/10">
-                      <div className="text-xs text-slate-300">Currently</div>
-                      <div className="mt-1 font-medium text-white">PolicyVault Nexus</div>
-                    </div>
-
-                    <div className="rounded-2xl border p-3 border-white/10">
-                      <div className="text-xs text-slate-300">Vision</div>
-                      <div className="mt-1 font-medium text-white">Crafting privacy-first digital solutions
-                        Empowering data-driven decisions</div>
-                    </div>
-
-                    <div className="rounded-2xl border p-3 border-white/10">
-                      <div className="text-xs text-slate-300">Future Focus</div>
-                      <div className="mt-1 font-medium text-white">Generative AI • Privacy Driven System</div>
-                    </div>
+                    <motion.a
+                      href={`mailto:${CONTACT.email}`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium transition ${isDark ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300" : "bg-blue-200 hover:bg-blue-300 text-blue-700"}`}
+                    >
+                      <Mail className="w-3 h-3" /> Mail
+                    </motion.a>
                   </div>
                 </div>
-                </section>
               </div>
-            </motion.div>
+
+              {/* Hover Expanded Social Icons */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                whileHover={{ opacity: 1, y: 0 }}
+                className="absolute -top-16 right-0 flex gap-2 pointer-events-none group-hover:pointer-events-auto"
+              >
+                <motion.a
+                  href={CONTACT.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`rounded-full p-2 shadow-lg transition ${isDark ? "bg-navy-900/95 text-slate-300 hover:text-blue-400 hover:bg-navy-900" : "bg-white text-slate-600 hover:text-blue-600 hover:bg-blue-50"}`}
+                >
+                  <Github className="w-5 h-5" />
+                </motion.a>
+                <motion.a
+                  href={CONTACT.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`rounded-full p-2 shadow-lg transition ${isDark ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-100 text-blue-600 hover:bg-blue-200"}`}
+                >
+                  <Linkedin className="w-5 h-5" />
+                </motion.a>
+              </motion.div>
+            </div>
           </motion.div>
-          <div className="pointer-events-none absolute left-1/2 bottom-6 hidden -translate-x-1/2 md:block">
-            <ArrowDown className="h-6 w-6 animate-bounce opacity-60 text-white" />
-          </div>
-        </section>
-
-        {/* About */}
-        <section id="about" className="mx-auto max-w-6xl px-4 py-16">
-          <motion.h2 variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-2xl font-bold md:text-3xl text-white">
-            About
-          </motion.h2>
-
-          <motion.p variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-3 max-w-3xl text-slate-200/90">
-            passionate about technology and innovation. With a strong foundation in
-software development, I aim to contribute to real-world projects by
-designing, coding, and debugging robust applications., along with strong
-communication and adaptability, I aim to contribute to impactful work in
-environments that value creativity and growth.
-          </motion.p>
-
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl border p-4 border-white/10">
-              <div className="text-xs text-slate-300">Location</div>
-              <div className="mt-1 font-medium text-white">{CONTACT.location}</div>
-            </div>
-
-            <div className="rounded-2xl border p-4 border-white/10">
-              <div className="text-xs text-slate-300">Contact</div>
-              <div className="mt-1 font-medium text-white">{CONTACT.phone}</div>
-              <div className="text-sm text-slate-300 mt-1">{CONTACT.email}</div>
-            </div>
-
-            <div className="rounded-2xl border p-4 border-white/10">
-              <div className="text-xs text-slate-300">Education</div>
-              <div className="mt-1 font-medium text-white">B.Tech in AI & DS • K.K. Wagh Institute</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Projects */}
-        <section id="projects" className="mx-auto max-w-6xl px-4 py-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold md:text-3xl text-white">Projects</h2>
-            <p className="text-sm text-slate-300">Selected work — backend & ML focused</p>
-          </div>
-
-          {/* Filter */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {allTags.map((t) => (
-              <button
-                key={t}
-                onClick={() => setFilter(t)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition hover:-translate-y-0.5 hover:shadow border-white/10 ${
-                  filter === t ? "ring-2 ring-[#00a8e8] text-white" : "text-slate-300"
-                }`}
-                aria-pressed={filter === t}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-            {filtered.map((p) => (
-              <ProjectCard key={p.title} project={p} />
-            ))}
-          </div>
-        </section>
-
-        {/* Achievements */}
-        <section id="achievements" className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold md:text-3xl text-white">Achievements & Hackathons</h2>
-          <p className="mt-2 text-sm text-slate-300">Selected awards, hackathon results and recognitions.</p>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {achievementsFromCV.map((a) => (
-              <motion.div
-                key={a.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                className="rounded-2xl border p-4 bg-white/5 shadow-sm border-white/10"
-              >
-                <div className="text-sm text-slate-300">{a.when}</div>
-                <div className="mt-1 font-semibold text-white">{a.title}</div>
-                <div className="mt-2 text-sm text-slate-300">{a.detail}</div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Experience */}
-        <section id="experience" className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold md:text-3xl text-white">Experience</h2>
-
-          <div className="mt-6 space-y-6 border-l pl-6 border-white/10">
-            {experienceFromCV.map((e) => (
-              <motion.div
-                key={e.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, amount: 0.2 }}
-                className="relative"
-              >
-                <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border bg-rich-black border-white/10" />
-                <div className="rounded-2xl border p-5 shadow-sm border-white/10">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="text-lg font-semibold text-white">{e.title}</div>
-                    <div className="text-sm text-slate-300">{e.period}</div>
-                  </div>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-200/90">
-                    {e.details.map((p) => (
-                      <li key={p}>{p}</li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* Skills & Certificates */}
-        <section id="skills" className="mx-auto max-w-6xl px-4 py-12">
-          <h2 className="text-2xl font-bold md:text-3xl text-white">Skills & Certifications</h2>
-
-          <div className="mt-6 grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold text-white">Skills</h3>
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {[
-                  "Python",
-                  "FastAPI",
-                  "SQL",
-                  "Java and Advance Java",
-                  "MongoDB",
-                  "NLP",
-                  "OCR",
-                  "Computer Vision",
-                  "React",
-                  "Tauri",
-                  "PHP",
-                  "Flutter",
-                  "Firebase",
-                  "Blockchain",
-                  "IPFS",
-                ].map((s) => (
-                  <div key={s} className="rounded-2xl border px-4 py-3 text-sm font-medium shadow-sm border-white/10 text-white">
-                    {s}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Certificates */}
-           <div>
-             <h3 className="text-lg font-semibold text-white">Certificates (click to view)</h3>
-             <ul className="mt-4 space-y-2 text-sm">
-               {certificatesList.map((certificate, i) => (
-                 <CertificateItem key={i} certificate={certificate} />
-               ))}
-             </ul>
-           </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="mt-12 bg-transparent py-8">
-          <div className="max-w-6xl mx-auto px-4 text-center text-sm text-slate-300">
-            © {new Date().getFullYear()} {CONTACT.name}. All rights reserved.
-          </div>
-        </footer>
-      </main>
-
-      {/* Compact Contact Card (fixed, inspired by reference) */}
-      <div
-        id="contact-card"
-        className="fixed right-6 bottom-6 z-60 transform transition-all"
-        aria-hidden={false}
-      >
-        <div className="group relative">
-          <div className="rounded-2xl bg-[#071026]/95 border border-white/10 p-3 shadow-xl backdrop-blur flex items-center gap-3 w-64">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold shadow">
-                VJ
-              </div>
-            </div>
-
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-white">{CONTACT.name}</div>
-              <div className="text-xs text-slate-300">{CONTACT.location}</div>
-              <div className="mt-2 flex items-center gap-2">
-                <a
-                  href={`tel:${CONTACT.phone.replace(/\s+/g, "")}`}
-                  className="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs bg-white/5 hover:bg-white/10 transition text-white"
-                  aria-label="Call"
-                >
-                  <Phone className="w-4 h-4" /> <span>{CONTACT.phone}</span>
-                </a>
-
-                <a
-                  href={`mailto:${CONTACT.email}`}
-                  className="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs bg-white/5 hover:bg-white/10 transition text-white"
-                  aria-label="Email"
-                >
-                  <Mail className="w-4 h-4" /> <span>Mail</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* hover CTA bar */}
-          <div className="absolute -bottom-12 right-0 hidden group-hover:flex space-x-2">
-            <a
-              href={CONTACT.github}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full bg-black/90 text-white p-2 shadow hover:scale-105 transition"
-              aria-label="GitHub"
-            >
-              <Github className="w-4 h-4" />
-            </a>
-            <a
-              href={CONTACT.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full bg-blue-600 text-white p-2 shadow hover:scale-105 transition"
-              aria-label="LinkedIn"
-            >
-              <Linkedin className="w-4 h-4" />
-            </a>
-          </div>
         </div>
       </div>
     </div>
