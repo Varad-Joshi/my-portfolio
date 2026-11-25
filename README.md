@@ -15,26 +15,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Configure contact email
+## Contact form
 
-The contact form sends messages through Resend from the server. Copy
-`.env.example` to `.env.local`, create a Resend API key, verify the sender
-domain in Resend, and set:
-
-- `RESEND_API_KEY` — secret Resend API key. Keep it server-side; never expose it
-  with a `NEXT_PUBLIC_` prefix.
-- `RESEND_FROM_EMAIL` — sender address verified by Resend, for example
-  `Varad Joshi <portfolio@your-verified-domain.com>`.
-- `NEXT_PUBLIC_SITE_URL` — the canonical absolute URL for metadata and sitemap.
-
-The recipient is the professional email in `src/data/portfolio.ts`. Restart the
-development server after changing environment variables. The form validates
-submissions on both client and server, uses a hidden honeypot field, and applies
-a per-client in-memory rate limit. For multi-instance deployments, add a shared
-rate-limit store at the hosting layer. If Resend credentials are missing or
-delivery is rejected, the form displays an error instead of a success state.
-The “Open in email app” action also launches a `mailto:` draft with the form
-details filled in.
+The contact form validates its fields, then opens a Gmail compose tab with the
+professional recipient and entered subject prefilled. The message body includes
+the visitor's message, name and email address. Visitors review and send the
+message themselves in Gmail; this portfolio does not send emails or require
+email-provider credentials. If a browser blocks the new tab, the form displays
+a link to open the prepared draft.
 
 ## Update portfolio content
 
@@ -49,7 +37,7 @@ details filled in.
   entries in `src/data/portfolio.ts`.
 - The repository does not include a resume PDF. The hero action currently opens
   an email request instead of presenting a non-existent download.
-- Set `NEXT_PUBLIC_SITE_URL` to the canonical, absolute website URL in the
+-   Set `NEXT_PUBLIC_SITE_URL` to the canonical, absolute website URL in the
   deployment environment. It is used for metadata, structured data, robots and
   the sitemap.
 
