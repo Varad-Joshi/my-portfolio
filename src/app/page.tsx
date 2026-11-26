@@ -193,7 +193,7 @@ export default function Home() {
             <div className="about-grid">
               <div className="about-copy">
                 <p>
-                  I&apos;m pursuing a B.Tech in Artificial Intelligence and Data
+                  I&apos;ve Completed  B.Tech in Artificial Intelligence and Data
                   Science at K.K. Wagh Institute. I enjoy taking ideas from
                   models and prototypes to practical software people can use.
                 </p>
