@@ -117,12 +117,12 @@ export default function Home() {
               <a className="button button-primary" href="#projects">
                 Explore projects <ArrowDown size={16} aria-hidden="true" />
               </a>
-              <a
+              {/* <a
                 className="button button-secondary"
                 href={`mailto:${contact.email}?subject=Resume%20request`}
               >
                 Request resume <ArrowUpRight size={16} aria-hidden="true" />
-              </a>
+              </a> */}
             </div>
             <p className="resume-note">
               A resume PDF was not included in the repository. This link opens
